@@ -1,0 +1,338 @@
+%% Class Diagram 1: User Management Classes
+classDiagram
+    class User {
+        +int id
+        +string username
+        +string email
+        +string password
+        +string first_name
+        +string last_name
+        +boolean is_active
+        +datetime date_joined
+        +datetime last_login
+        +login()
+        +logout()
+        +change_password()
+        +update_profile()
+    }
+
+    class CustomUser {
+        +string user_type
+        +string phone
+        +string emergency_contact
+        +string profile_picture
+        +get_user_type()
+        +get_full_name()
+        +is_student()
+        +is_staff()
+    }
+
+    class StudentProfile {
+        +string student_id
+        +string department
+        +int academic_year
+        +int semester
+        +string faculty
+        +datetime enrollment_date
+        +boolean is_active
+        +get_academic_info()
+        +get_room_status()
+        +get_complaints()
+    }
+
+    class StaffProfile {
+        +string employee_id
+        +string designation
+        +string department
+        +datetime joining_date
+        +get_assigned_complaints()
+        +get_managed_rooms()
+    }
+
+    User <|-- CustomUser
+    CustomUser ||--|| StudentProfile
+    CustomUser ||--|| StaffProfile
+
+---
+
+%% Class Diagram 2: Room Management Classes
+classDiagram
+    class Room {
+        +string room_number
+        +int capacity
+        +int current_occupancy
+        +string room_type
+        +json facilities
+        +string block
+        +int floor
+        +boolean is_available
+        +get_available_beds()
+        +get_occupants()
+        +allocate_bed()
+        +deallocate_bed()
+    }
+
+    class RoomApplication {
+        +int application_id
+        +datetime application_date
+        +string status
+        +int priority_score
+        +string preferences
+        +string justification
+        +datetime processed_date
+        +submit_application()
+        +approve_application()
+        +reject_application()
+    }
+
+    class RoomAllocation {
+        +datetime allocation_date
+        +datetime move_in_date
+        +datetime move_out_date
+        +boolean is_current
+        +string bed_number
+        +allocate_room()
+        +deallocate_room()
+        +transfer_room()
+    }
+
+    StudentProfile ||--o{ RoomApplication
+    Room ||--o{ RoomApplication
+    StudentProfile ||--o{ RoomAllocation
+    Room ||--o{ RoomAllocation
+    RoomApplication ||--|| RoomAllocation
+
+---
+
+%% Class Diagram 3: Complaint Management Classes
+classDiagram
+    class Complaint {
+        +int complaint_id
+        +string category
+        +string title
+        +text description
+        +string priority
+        +string status
+        +datetime created_date
+        +datetime resolved_date
+        +string location
+        +submit_complaint()
+        +update_status()
+        +resolve_complaint()
+        +close_complaint()
+    }
+
+    class ComplaintCategory {
+        +string category_name
+        +string description
+        +boolean is_active
+        +get_complaints()
+    }
+
+    class ComplaintStatus {
+        +string status_name
+        +string description
+        +int order_sequence
+        +get_complaints()
+    }
+
+    class ComplaintAttachment {
+        +string file_path
+        +string filename
+        +int file_size
+        +string file_type
+        +datetime uploaded_date
+        +upload_file()
+        +delete_file()
+    }
+
+    StudentProfile ||--o{ Complaint
+    StaffProfile ||--o{ Complaint
+    Complaint }o--|| ComplaintCategory
+    Complaint }o--|| ComplaintStatus
+    Complaint ||--o{ ComplaintAttachment
+
+---
+
+%% Class Diagram 4: Notice and Communication Classes
+classDiagram
+    class Notice {
+        +int notice_id
+        +string title
+        +text content
+        +string category
+        +string priority
+        +datetime created_date
+        +datetime expires_date
+        +boolean is_active
+        +string target_audience
+        +create_notice()
+        +update_notice()
+        +delete_notice()
+        +publish_notice()
+    }
+
+    class NoticeCategory {
+        +string category_name
+        +string description
+        +string color_code
+        +get_notices()
+    }
+
+    class NoticeAttachment {
+        +string file_path
+        +string filename
+        +int file_size
+        +datetime uploaded_date
+        +upload_file()
+        +delete_file()
+    }
+
+    class NoticeReadStatus {
+        +datetime read_date
+        +boolean is_read
+        +mark_as_read()
+        +mark_as_unread()
+    }
+
+    StaffProfile ||--o{ Notice
+    Notice }o--|| NoticeCategory
+    Notice ||--o{ NoticeAttachment
+    Notice ||--o{ NoticeReadStatus
+    StudentProfile ||--o{ NoticeReadStatus
+
+---
+
+%% Class Diagram 5: Stipend Management Classes
+classDiagram
+    class StipendTransaction {
+        +int transaction_id
+        +decimal amount
+        +datetime transaction_date
+        +string payment_method
+        +string reference_number
+        +string status
+        +text notes
+        +process_transaction()
+        +verify_transaction()
+        +cancel_transaction()
+    }
+
+    class StipendEligibility {
+        +int academic_year
+        +int semester
+        +boolean is_eligible
+        +decimal eligibility_amount
+        +json criteria_met
+        +datetime last_updated
+        +check_eligibility()
+        +update_eligibility()
+    }
+
+    class StipendReport {
+        +datetime report_date
+        +string report_type
+        +json report_data
+        +string file_path
+        +generate_report()
+        +export_report()
+    }
+
+    StudentProfile ||--o{ StipendTransaction
+    StaffProfile ||--o{ StipendTransaction
+    StudentProfile ||--o{ StipendEligibility
+    StipendTransaction ||--o{ StipendReport
+
+---
+
+%% Class Diagram 6: Lost & Found and Visitor Management Classes
+classDiagram
+    class LostItem {
+        +int item_id
+        +string item_name
+        +text description
+        +string category
+        +string lost_location
+        +datetime lost_date
+        +string contact_info
+        +string image_path
+        +string status
+        +datetime expires_date
+        +report_lost()
+        +mark_found()
+        +close_report()
+    }
+
+    class VisitorLog {
+        +int visitor_id
+        +string visitor_name
+        +string visitor_phone
+        +string visit_purpose
+        +datetime planned_visit_date
+        +int expected_duration
+        +datetime actual_checkin
+        +datetime actual_checkout
+        +string status
+        +text notes
+        +register_visitor()
+        +checkin_visitor()
+        +checkout_visitor()
+    }
+
+    class ItemCategory {
+        +string category_name
+        +string description
+        +get_items()
+    }
+
+    StudentProfile ||--o{ LostItem
+    StudentProfile ||--o{ VisitorLog
+    LostItem }o--|| ItemCategory
+
+---
+
+%% Class Diagram 7: System Management Classes
+classDiagram
+    class SystemConfiguration {
+        +string config_key
+        +string config_value
+        +string description
+        +boolean is_active
+        +update_config()
+        +get_config()
+    }
+
+    class AuditLog {
+        +datetime timestamp
+        +string action
+        +string table_name
+        +string record_id
+        +json old_values
+        +json new_values
+        +log_action()
+        +get_audit_trail()
+    }
+
+    class Dashboard {
+        +get_student_dashboard()
+        +get_staff_dashboard()
+        +get_admin_dashboard()
+        +get_statistics()
+    }
+
+    class Report {
+        +string report_type
+        +datetime generated_date
+        +json report_data
+        +string file_path
+        +generate_report()
+        +export_report()
+        +schedule_report()
+    }
+
+    CustomUser ||--o{ AuditLog
+    StaffProfile ||--o{ Report
+    Dashboard ..> StudentProfile
+    Dashboard ..> StaffProfile
+    Dashboard ..> Room
+    Dashboard ..> Complaint
