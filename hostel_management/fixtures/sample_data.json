@@ -1,0 +1,336 @@
+[
+  {
+    "model": "hostel_management.customuser",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$fake_hash_for_admin123",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "System",
+      "last_name": "Administrator",
+      "email": "admin@bau.edu.bd",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "user_type": "admin",
+      "phone": "+880-1700-000001"
+    }
+  },
+  {
+    "model": "hostel_management.customuser",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$fake_hash_for_staff123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "staff1",
+      "first_name": "Mohammad",
+      "last_name": "Rahman",
+      "email": "staff1@bau.edu.bd",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "user_type": "staff",
+      "phone": "+880-1700-000002"
+    }
+  },
+  {
+    "model": "hostel_management.customuser",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$fake_hash_for_provost123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "provost1",
+      "first_name": "Dr. Abdul",
+      "last_name": "Karim",
+      "email": "provost@bau.edu.bd",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "user_type": "provost",
+      "phone": "+880-1700-000003"
+    }
+  },
+  {
+    "model": "hostel_management.customuser",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$fake_hash_for_student123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "student1",
+      "first_name": "Ahmed",
+      "last_name": "Hassan",
+      "email": "student1@bau.edu.bd",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "user_type": "student",
+      "phone": "+880-1700-000004"
+    }
+  },
+  {
+    "model": "hostel_management.customuser",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$fake_hash_for_student123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "student2",
+      "first_name": "Fatima",
+      "last_name": "Khan",
+      "email": "student2@bau.edu.bd",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "user_type": "student",
+      "phone": "+880-1700-000005"
+    }
+  },
+  {
+    "model": "hostel_management.customuser",
+    "pk": 6,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$fake_hash_for_student123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "student3",
+      "first_name": "Rahim",
+      "last_name": "Uddin",
+      "email": "student3@bau.edu.bd",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "user_type": "student",
+      "phone": "+880-1700-000006"
+    }
+  },
+  {
+    "model": "hostel_management.studentprofile",
+    "pk": 1,
+    "fields": {
+      "user": 4,
+      "student_id": "BAU-CS-2023-001",
+      "department": "Computer Science",
+      "faculty": "Engineering",
+      "academic_level": "Graduate",
+      "academic_year": 2023,
+      "semester": "Fall",
+      "date_of_enrollment": "2023-01-15",
+      "emergency_contact": "+880-1700-111001",
+      "emergency_contact_name": "Hassan Ahmed (Father)",
+      "is_allocated": false
+    }
+  },
+  {
+    "model": "hostel_management.studentprofile",
+    "pk": 2,
+    "fields": {
+      "user": 5,
+      "student_id": "BAU-BIO-2022-015",
+      "department": "Biology",
+      "faculty": "Life Sciences",
+      "academic_level": "Graduate",
+      "academic_year": 2022,
+      "semester": "Spring",
+      "date_of_enrollment": "2022-09-01",
+      "emergency_contact": "+880-1700-111002",
+      "emergency_contact_name": "Khan Mohammad (Father)",
+      "is_allocated": true
+    }
+  },
+  {
+    "model": "hostel_management.studentprofile",
+    "pk": 3,
+    "fields": {
+      "user": 6,
+      "student_id": "BAU-AGR-2021-032",
+      "department": "Agriculture",
+      "faculty": "Agriculture",
+      "academic_level": "Postgraduate",
+      "academic_year": 2021,
+      "semester": "Fall",
+      "date_of_enrollment": "2021-01-10",
+      "emergency_contact": "+880-1700-111003",
+      "emergency_contact_name": "Uddin Ali (Father)",
+      "is_allocated": false
+    }
+  },
+  {
+    "model": "hostel_management.room",
+    "pk": 1,
+    "fields": {
+      "room_number": "101",
+      "block": "A",
+      "floor": 1,
+      "room_type": "single",
+      "capacity": 1,
+      "current_occupancy": 0,
+      "is_available": true,
+      "has_attached_bathroom": true,
+      "has_ac": false
+    }
+  },
+  {
+    "model": "hostel_management.room",
+    "pk": 2,
+    "fields": {
+      "room_number": "102",
+      "block": "A",
+      "floor": 1,
+      "room_type": "double",
+      "capacity": 2,
+      "current_occupancy": 1,
+      "is_available": true,
+      "has_attached_bathroom": true,
+      "has_ac": false
+    }
+  },
+  {
+    "model": "hostel_management.room",
+    "pk": 3,
+    "fields": {
+      "room_number": "103",
+      "block": "A",
+      "floor": 1,
+      "room_type": "triple",
+      "capacity": 3,
+      "current_occupancy": 0,
+      "is_available": true,
+      "has_attached_bathroom": false,
+      "has_ac": false
+    }
+  },
+  {
+    "model": "hostel_management.room",
+    "pk": 4,
+    "fields": {
+      "room_number": "201",
+      "block": "B",
+      "floor": 2,
+      "room_type": "single",
+      "capacity": 1,
+      "current_occupancy": 0,
+      "is_available": true,
+      "has_attached_bathroom": true,
+      "has_ac": true
+    }
+  },
+  {
+    "model": "hostel_management.room",
+    "pk": 5,
+    "fields": {
+      "room_number": "202",
+      "block": "B",
+      "floor": 2,
+      "room_type": "double",
+      "capacity": 2,
+      "current_occupancy": 2,
+      "is_available": false,
+      "has_attached_bathroom": true,
+      "has_ac": true
+    }
+  },
+  {
+    "model": "hostel_management.roomallocation",
+    "pk": 1,
+    "fields": {
+      "student": 2,
+      "room": 2,
+      "allocated_date": "2024-02-01T10:00:00Z",
+      "allocated_by": 2,
+      "is_active": true,
+      "allocation_notes": "Allocated based on academic performance"
+    }
+  },
+  {
+    "model": "hostel_management.roomapplication",
+    "pk": 1,
+    "fields": {
+      "student": 1,
+      "room": 1,
+      "application_date": "2024-03-01T10:00:00Z",
+      "status": "pending",
+      "priority_score": 75,
+      "preferences": "Prefer quiet environment for studies"
+    }
+  },
+  {
+    "model": "hostel_management.roomapplication",
+    "pk": 2,
+    "fields": {
+      "student": 3,
+      "room": 4,
+      "application_date": "2024-03-02T14:30:00Z",
+      "status": "approved",
+      "priority_score": 85,
+      "preferences": "Need AC for health reasons",
+      "reviewed_by": 2,
+      "reviewed_date": "2024-03-03T09:00:00Z",
+      "admin_notes": "Approved due to high priority score and medical needs"
+    }
+  },
+  {
+    "model": "hostel_management.notice",
+    "pk": 1,
+    "fields": {
+      "title": "Welcome to BAU Hostel Management System",
+      "content": "Dear Students,\n\nWelcome to the newly launched BAU Hostel Management System. This digital platform will help you:\n\n• Apply for rooms online\n• Track your application status\n• File complaints and suggestions\n• Stay updated with hostel notices\n\nFor any technical issues, please contact the IT support team.\n\nBest regards,\nHostel Administration",
+      "category": "general",
+      "priority": "medium",
+      "created_by": 2,
+      "created_at": "2024-01-15T09:00:00Z",
+      "is_active": true,
+      "is_published": true,
+      "target_all_students": true
+    }
+  },
+  {
+    "model": "hostel_management.notice",
+    "pk": 2,
+    "fields": {
+      "title": "Room Application Deadline - Spring 2024",
+      "content": "Important Notice:\n\nThe deadline for Spring 2024 room applications is March 15, 2024.\n\nKey Points:\n• Applications must be submitted through the online portal\n• Late applications will not be accepted\n• Preference will be given to senior students\n• Room allocation results will be announced on March 20, 2024\n\nFor queries, contact the hostel office during working hours.\n\nHostel Administration Team",
+      "category": "urgent",
+      "priority": "high",
+      "created_by": 3,
+      "created_at": "2024-02-20T11:30:00Z",
+      "is_active": true,
+      "is_published": true,
+      "target_all_students": true,
+      "expires_at": "2024-03-20T23:59:59Z"
+    }
+  },
+  {
+    "model": "hostel_management.complaint",
+    "pk": 1,
+    "fields": {
+      "submitted_by": 4,
+      "category": "maintenance",
+      "priority": "medium",
+      "subject": "WiFi Connection Issues in Block A",
+      "description": "The WiFi connection in Block A, first floor has been very slow for the past week. Students are unable to attend online classes properly. Please resolve this issue urgently.",
+      "location": "Block A, Floor 1",
+      "status": "submitted",
+      "created_at": "2024-03-01T16:45:00Z"
+    }
+  },
+  {
+    "model": "hostel_management.complaint",
+    "pk": 2,
+    "fields": {
+      "submitted_by": 5,
+      "category": "facilities",
+      "priority": "low",
+      "subject": "Request for Study Room Extension Hours",
+      "description": "Currently the study room closes at 10 PM. During exam periods, students need to study late. Please consider extending the hours until 12 AM during exam weeks.",
+      "location": "Common Study Room",
+      "status": "in_progress",
+      "assigned_to": 2,
+      "assigned_date": "2024-03-02T10:00:00Z",
+      "created_at": "2024-03-01T20:30:00Z"
+    }
+  }
+]

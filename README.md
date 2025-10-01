@@ -27,7 +27,7 @@ The BAU Hostel Management System is designed to digitize and automate hostel ope
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/SayefEshan/hostel-management-system
    cd bau_hostel_management
    ```
 
@@ -63,8 +63,8 @@ The BAU Hostel Management System is designed to digitize and automate hostel ope
    # Set up staff groups and permissions
    python manage.py setup_staff_permissions
    
-   # Create sample data (optional)
-   python manage.py shell -c "exec(open('create_sample_data.py').read())"
+   # Create sample data for testing (recommended)
+   python manage.py seed_data
    
    # Assign staff roles automatically
    python manage.py assign_staff_roles --auto
@@ -86,7 +86,7 @@ The BAU Hostel Management System is designed to digitize and automate hostel ope
 
 ## 🔐 Default User Accounts
 
-After running the sample data creation, you'll have these test accounts:
+After running `python manage.py seed_data`, you'll have these test accounts:
 
 ### Admin Access
 - **Username**: `admin`
@@ -99,9 +99,14 @@ After running the sample data creation, you'll have these test accounts:
 - **Role**: Hostel Staff (Limited Admin Access)
 
 ### Student Access
-- **Username**: `student1`, `student2`, `student3`
+- **Username**: `student1`, `student2`, `student3`, `student4`, `student5`
 - **Password**: `student123`
 - **Role**: Students (Application and Profile Access)
+
+### Provost Access
+- **Username**: `provost1`
+- **Password**: `provost123`
+- **Role**: Provost (Enhanced Admin Access)
 
 ## 📁 Project Structure
 
@@ -149,6 +154,21 @@ python manage.py createsuperuser
 
 # Access Django shell
 python manage.py shell
+```
+
+### Sample Data Management
+```bash
+# Create comprehensive sample data (recommended for testing)
+python manage.py seed_data
+
+# Clear all data and reseed
+python manage.py seed_data --clear
+
+# Create only users and profiles (minimal setup)
+python manage.py seed_data --users-only
+
+# Alternative: Load from fixtures (static data)
+python manage.py loaddata hostel_management/fixtures/sample_data.json
 ```
 
 ### Static Files
