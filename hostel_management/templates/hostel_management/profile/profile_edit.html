@@ -1,0 +1,273 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}Edit Profile - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:profile' %}">Profile</a></li>
+                <li class="breadcrumb-item active">Edit</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-user-edit me-2"></i>Edit Profile</h4>
+            </div>
+            <div class="card-body">
+                {% if user.user_type == 'student' %}
+                    <!-- Student Profile Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Academic Information -->
+                        <h5 class="mb-3"><i class="fas fa-graduation-cap me-2"></i>Academic Information</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.student_id.id_for_label }}" class="form-label">
+                                        <i class="fas fa-id-badge me-1"></i>Student ID *
+                                    </label>
+                                    <input type="text" class="form-control {% if form.student_id.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.student_id.name }}" 
+                                           id="{{ form.student_id.id_for_label }}" 
+                                           value="{{ form.student_id.value|default:'' }}" required>
+                                    {% if form.student_id.errors %}
+                                        <div class="invalid-feedback">{{ form.student_id.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.student_id.help_text }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.department.id_for_label }}" class="form-label">
+                                        <i class="fas fa-building me-1"></i>Department *
+                                    </label>
+                                    <input type="text" class="form-control {% if form.department.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.department.name }}" 
+                                           id="{{ form.department.id_for_label }}" 
+                                           value="{{ form.department.value|default:'' }}" 
+                                           placeholder="e.g., Computer Science and Engineering" required>
+                                    {% if form.department.errors %}
+                                        <div class="invalid-feedback">{{ form.department.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.faculty.id_for_label }}" class="form-label">
+                                        <i class="fas fa-university me-1"></i>Faculty *
+                                    </label>
+                                    <input type="text" class="form-control {% if form.faculty.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.faculty.name }}" 
+                                           id="{{ form.faculty.id_for_label }}" 
+                                           value="{{ form.faculty.value|default:'' }}" 
+                                           placeholder="e.g., Faculty of Engineering" required>
+                                    {% if form.faculty.errors %}
+                                        <div class="invalid-feedback">{{ form.faculty.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.academic_level.id_for_label }}" class="form-label">
+                                        <i class="fas fa-layer-group me-1"></i>Academic Level *
+                                    </label>
+                                    <select class="form-control {% if form.academic_level.errors %}is-invalid{% endif %}" 
+                                            name="{{ form.academic_level.name }}" 
+                                            id="{{ form.academic_level.id_for_label }}" required>
+                                        <option value="">Select Level</option>
+                                        <option value="Undergraduate" {% if form.academic_level.value == 'Undergraduate' %}selected{% endif %}>Undergraduate</option>
+                                        <option value="Graduate" {% if form.academic_level.value == 'Graduate' %}selected{% endif %}>Graduate</option>
+                                        <option value="Postgraduate" {% if form.academic_level.value == 'Postgraduate' %}selected{% endif %}>Postgraduate</option>
+                                        <option value="PhD" {% if form.academic_level.value == 'PhD' %}selected{% endif %}>PhD</option>
+                                    </select>
+                                    {% if form.academic_level.errors %}
+                                        <div class="invalid-feedback">{{ form.academic_level.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.academic_year.id_for_label }}" class="form-label">
+                                        <i class="fas fa-calendar me-1"></i>Academic Year *
+                                    </label>
+                                    <input type="number" class="form-control {% if form.academic_year.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.academic_year.name }}" 
+                                           id="{{ form.academic_year.id_for_label }}" 
+                                           value="{{ form.academic_year.value|default:'' }}" 
+                                           min="2020" max="2030" required>
+                                    {% if form.academic_year.errors %}
+                                        <div class="invalid-feedback">{{ form.academic_year.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.semester.id_for_label }}" class="form-label">
+                                        <i class="fas fa-calendar-alt me-1"></i>Semester *
+                                    </label>
+                                    <input type="number" class="form-control {% if form.semester.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.semester.name }}" 
+                                           id="{{ form.semester.id_for_label }}" 
+                                           value="{{ form.semester.value|default:'' }}" 
+                                           min="1" max="8" required>
+                                    {% if form.semester.errors %}
+                                        <div class="invalid-feedback">{{ form.semester.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.date_of_enrollment.id_for_label }}" class="form-label">
+                                        <i class="fas fa-calendar-plus me-1"></i>Enrollment Date *
+                                    </label>
+                                    <input type="date" class="form-control {% if form.date_of_enrollment.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.date_of_enrollment.name }}" 
+                                           id="{{ form.date_of_enrollment.id_for_label }}" 
+                                           value="{{ form.date_of_enrollment.value|date:'Y-m-d'|default:'' }}" required>
+                                    {% if form.date_of_enrollment.errors %}
+                                        <div class="invalid-feedback">{{ form.date_of_enrollment.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Emergency Contact Information -->
+                        <h5 class="mb-3"><i class="fas fa-phone-alt me-2"></i>Emergency Contact Information</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Emergency Contact Name *
+                                    </label>
+                                    <input type="text" class="form-control {% if form.emergency_contact_name.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.emergency_contact_name.name }}" 
+                                           id="{{ form.emergency_contact_name.id_for_label }}" 
+                                           value="{{ form.emergency_contact_name.value|default:'' }}" 
+                                           placeholder="e.g., Father's Name" required>
+                                    {% if form.emergency_contact_name.errors %}
+                                        <div class="invalid-feedback">{{ form.emergency_contact_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.emergency_contact.id_for_label }}" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>Emergency Contact Phone *
+                                    </label>
+                                    <input type="tel" class="form-control {% if form.emergency_contact.errors %}is-invalid{% endif %}" 
+                                           name="{{ form.emergency_contact.name }}" 
+                                           id="{{ form.emergency_contact.id_for_label }}" 
+                                           value="{{ form.emergency_contact.value|default:'' }}" 
+                                           placeholder="+880-XXX-XXXXXXX" required>
+                                    {% if form.emergency_contact.errors %}
+                                        <div class="invalid-feedback">{{ form.emergency_contact.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.emergency_contact.help_text }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Important Notes</h6>
+                            <ul class="mb-0">
+                                <li>Ensure all information is accurate as it will be used for official purposes</li>
+                                <li>Emergency contact information is crucial for safety and communication</li>
+                                <li>You can update this information anytime by visiting this page</li>
+                                <li>Complete profile information is required for room allocation</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'hostel_management:profile' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <!-- Non-student users -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>Profile Editing</h6>
+                        <p>Profile editing for {{ user.get_user_type_display|lower }} users is managed through the admin panel.</p>
+                        <a href="/admin/" class="btn btn-primary">
+                            <i class="fas fa-cog me-2"></i>Go to Admin Panel
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Profile Tips -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-lightbulb me-2"></i>Profile Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <h6>Keep your profile updated:</h6>
+                    <ul>
+                        <li>Accurate student ID is essential</li>
+                        <li>Provide correct department and faculty</li>
+                        <li>Emergency contact should be reachable</li>
+                        <li>Update semester information regularly</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Profile benefits:</h6>
+                    <ul>
+                        <li>Faster room allocation process</li>
+                        <li>Better communication from admin</li>
+                        <li>Access to all system features</li>
+                        <li>Emergency contact availability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-question-circle me-2"></i>Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <p class="small">
+                    If you're unsure about any information or need help updating your profile, contact the hostel office.
+                </p>
+                <p class="small">
+                    <strong>Office Hours:</strong> 9 AM - 5 PM<br>
+                    <strong>Phone:</strong> +880-XXX-XXXXXX<br>
+                    <strong>Email:</strong> hostel@bau.edu.bd
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

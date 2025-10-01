@@ -1,0 +1,270 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}My Complaints - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {% if user.user_type in 'staff,provost,admin' %}
+                    All Complaints
+                {% else %}
+                    My Complaints
+                {% endif %}
+            </h1>
+            <a href="{% url 'hostel_management:complaint_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Complaint
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% if complaints %}
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list me-2"></i>Complaint History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    {% if user.user_type in 'staff,provost,admin' %}
+                                        <th>Submitted By</th>
+                                    {% endif %}
+                                    <th>Category</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for complaint in complaints %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ complaint.subject }}</strong>
+                                        {% if complaint.location %}
+                                            <br><small class="text-muted">
+                                                <i class="fas fa-map-marker-alt me-1"></i>{{ complaint.location }}
+                                            </small>
+                                        {% endif %}
+                                    </td>
+                                    {% if user.user_type in 'staff,provost,admin' %}
+                                    <td>{{ complaint.submitted_by.get_full_name|default:complaint.submitted_by.username }}</td>
+                                    {% endif %}
+                                    <td>
+                                        {% if complaint.category == 'maintenance' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-tools me-1"></i>{{ complaint.get_category_display }}
+                                            </span>
+                                        {% elif complaint.category == 'security' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-shield-alt me-1"></i>{{ complaint.get_category_display }}
+                                            </span>
+                                        {% elif complaint.category == 'facilities' %}
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-cog me-1"></i>{{ complaint.get_category_display }}
+                                            </span>
+                                        {% elif complaint.category == 'cleanliness' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-broom me-1"></i>{{ complaint.get_category_display }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                {{ complaint.get_category_display }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if complaint.priority == 'urgent' %}
+                                            <span class="badge bg-danger">Urgent</span>
+                                        {% elif complaint.priority == 'high' %}
+                                            <span class="badge bg-warning">High</span>
+                                        {% elif complaint.priority == 'medium' %}
+                                            <span class="badge bg-info">Medium</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Low</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if complaint.status == 'submitted' %}
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-paper-plane me-1"></i>Submitted
+                                            </span>
+                                        {% elif complaint.status == 'in_progress' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-spinner me-1"></i>In Progress
+                                            </span>
+                                        {% elif complaint.status == 'resolved' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Resolved
+                                            </span>
+                                        {% elif complaint.status == 'closed' %}
+                                            <span class="badge bg-dark">
+                                                <i class="fas fa-lock me-1"></i>Closed
+                                            </span>
+                                        {% elif complaint.status == 'rejected' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Rejected
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ complaint.created_at|date:"M d, Y" }}
+                                        <br><small class="text-muted">{{ complaint.days_since_submission }} days ago</small>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'hostel_management:complaint_detail' complaint.pk %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                        {% if user.user_type in 'staff,provost,admin' and complaint.assigned_to != user %}
+                                            <a href="/admin/hostel_management/complaint/{{ complaint.pk }}/change/" 
+                                               class="btn btn-sm btn-outline-warning">
+                                                <i class="fas fa-edit me-1"></i>Manage
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <nav aria-label="Complaint pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Complaint Statistics -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-primary">{{ complaints|length }}</h3>
+                            <p class="card-text">Total Complaints</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-warning">
+                                {% for comp in complaints %}{% if comp.status == 'submitted' or comp.status == 'in_progress' %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %}
+                            </h3>
+                            <p class="card-text">Open</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-success">
+                                {% for comp in complaints %}{% if comp.status == 'resolved' %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %}
+                            </h3>
+                            <p class="card-text">Resolved</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-dark">
+                                {% for comp in complaints %}{% if comp.status == 'closed' %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %}
+                            </h3>
+                            <p class="card-text">Closed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        {% else %}
+            <!-- No Complaints -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-clipboard fa-3x text-muted mb-3"></i>
+                    <h4>No Complaints</h4>
+                    <p class="text-muted">
+                        {% if user.user_type in 'staff,provost,admin' %}
+                            No complaints have been submitted yet.
+                        {% else %}
+                            You haven't submitted any complaints yet. If you have any issues, feel free to submit a complaint.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'hostel_management:complaint_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Submit New Complaint
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <a href="{% url 'hostel_management:complaint_create' %}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="fas fa-plus me-2"></i>New Complaint
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'hostel_management:notice_list' %}" class="btn btn-outline-info w-100 mb-2">
+                            <i class="fas fa-bullhorn me-2"></i>View Notices
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'hostel_management:dashboard' %}" class="btn btn-outline-success w-100 mb-2">
+                            <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_urls %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #0d6efd;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        
+        .stat-icon {
+            font-size: 2em;
+            color: #0d6efd;
+            opacity: 0.7;
+        }
+        
+        .quick-actions {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .quick-actions h3 {
+            margin: 0 0 15px 0;
+            color: #0d6efd;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            text-decoration: none;
+            color: inherit;
+            transition: background-color 0.2s;
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .action-item:hover {
+            background: #e9ecef;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .action-desc {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    {% if not user.is_superuser %}
+    <!-- Staff User Notice -->
+    <div class="staff-notice">
+        <h4><i class="fas fa-info-circle"></i> Staff Access Panel</h4>
+        <p>Welcome {{ user.get_full_name|default:user.username }}! You have {{ user.groups.first.name|default:"Staff" }} access.</p>
+        <p><strong>Your permissions:</strong></p>
+        <ul>
+            {% if perms.hostel_management.view_roomapplication %}
+                <li><i class="fas fa-check text-success"></i> View & manage room applications</li>
+            {% endif %}
+            {% if perms.hostel_management.add_roomallocation %}
+                <li><i class="fas fa-check text-success"></i> Create room allocations</li>
+            {% endif %}
+            {% if perms.hostel_management.change_room %}
+                <li><i class="fas fa-check text-success"></i> Manage room information</li>
+            {% endif %}
+            {% if perms.hostel_management.add_room %}
+                <li><i class="fas fa-check text-success"></i> Add new rooms</li>
+            {% endif %}
+            {% if perms.hostel_management.change_complaint %}
+                <li><i class="fas fa-check text-success"></i> Handle complaints</li>
+            {% endif %}
+            {% if perms.hostel_management.add_notice %}
+                <li><i class="fas fa-check text-success"></i> Create notices</li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    {% include "admin/app_list.html" with app_list=app_list only %}
+    
+    <!-- Dashboard Statistics -->
+    <div class="quick-actions">
+        <h3><i class="fas fa-chart-bar"></i> System Overview</h3>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number" id="total-students">-</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-bed"></i>
+                </div>
+                <div class="stat-number" id="total-rooms">-</div>
+                <div class="stat-label">Total Rooms</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number" id="pending-applications">-</div>
+                <div class="stat-label">Pending Applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-number" id="open-complaints">-</div>
+                <div class="stat-label">Open Complaints</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <div class="action-grid">
+            <a href="{% url 'admin:hostel_management_roomapplication_changelist' %}?status__exact=pending" class="action-item">
+                <div class="action-title">
+                    <i class="fas fa-clock text-warning"></i> Review Pending Applications
+                </div>
+                <div class="action-desc">Review and approve/reject room applications</div>
+            </a>
+            
+            <a href="{% url 'admin:hostel_management_room_add' %}" class="action-item">
+                <div class="action-title">
+                    <i class="fas fa-plus text-success"></i> Add New Room
+                </div>
+                <div class="action-desc">Add a new room to the hostel system</div>
+            </a>
+            
+            <a href="{% url 'admin:hostel_management_notice_add' %}" class="action-item">
+                <div class="action-title">
+                    <i class="fas fa-bullhorn text-info"></i> Create Notice
+                </div>
+                <div class="action-desc">Publish a new notice for students</div>
+            </a>
+            
+            <a href="{% url 'admin:hostel_management_complaint_changelist' %}?status__in=submitted,in_progress" class="action-item">
+                <div class="action-title">
+                    <i class="fas fa-wrench text-danger"></i> Handle Complaints
+                </div>
+                <div class="action-desc">Address student complaints and issues</div>
+            </a>
+            
+            <a href="{% url 'admin:hostel_management_roomallocation_changelist' %}" class="action-item">
+                <div class="action-title">
+                    <i class="fas fa-users-cog text-primary"></i> Manage Allocations
+                </div>
+                <div class="action-desc">View and manage room allocations</div>
+            </a>
+            
+            <a href="{% url 'admin:hostel_management_studentprofile_changelist' %}" class="action-item">
+                <div class="action-title">
+                    <i class="fas fa-user-graduate text-secondary"></i> Student Profiles
+                </div>
+                <div class="action-desc">View and manage student information</div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch and display statistics (you can expand this with actual API calls)
+    // For now, we'll use placeholder data
+    
+    // You can implement actual AJAX calls to get real data
+    setTimeout(() => {
+        document.getElementById('total-students').textContent = '{{ user.is_superuser|yesno:"Loading...,Access Denied" }}';
+        document.getElementById('total-rooms').textContent = '{{ user.is_superuser|yesno:"Loading...,Access Denied" }}';
+        document.getElementById('pending-applications').textContent = '{{ user.is_superuser|yesno:"Loading...,Access Denied" }}';
+        document.getElementById('open-complaints').textContent = '{{ user.is_superuser|yesno:"Loading...,Access Denied" }}';
+    }, 500);
+});
+</script>
+{% endblock %}

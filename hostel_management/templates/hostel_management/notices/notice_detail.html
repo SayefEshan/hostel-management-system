@@ -1,0 +1,230 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}{{ notice.title }} - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:notice_list' %}">Notices</a></li>
+                <li class="breadcrumb-item active">{{ notice.title|truncatewords:5 }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card {% if notice.priority == 'urgent' %}border-danger{% elif notice.priority == 'high' %}border-warning{% endif %}">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h4 class="mb-2">
+                            {% if notice.priority == 'urgent' %}
+                                <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                            {% elif notice.priority == 'high' %}
+                                <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                            {% elif notice.category == 'academic' %}
+                                <i class="fas fa-graduation-cap text-primary me-2"></i>
+                            {% elif notice.category == 'maintenance' %}
+                                <i class="fas fa-tools text-info me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle text-secondary me-2"></i>
+                            {% endif %}
+                            {{ notice.title }}
+                        </h4>
+                        <div class="text-muted">
+                            <small>
+                                <i class="fas fa-user me-1"></i>{{ notice.created_by.get_full_name|default:notice.created_by.username }}
+                                <i class="fas fa-calendar ms-3 me-1"></i>{{ notice.created_at|date:"F d, Y g:i A" }}
+                                {% if notice.expires_at %}
+                                    <i class="fas fa-clock ms-3 me-1"></i>Expires: {{ notice.expires_at|date:"F d, Y" }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    <div>
+                        <!-- Priority Badge -->
+                        {% if notice.priority == 'urgent' %}
+                            <span class="badge bg-danger fs-6">Urgent</span>
+                        {% elif notice.priority == 'high' %}
+                            <span class="badge bg-warning fs-6">High Priority</span>
+                        {% elif notice.priority == 'medium' %}
+                            <span class="badge bg-info fs-6">Medium Priority</span>
+                        {% else %}
+                            <span class="badge bg-secondary fs-6">Low Priority</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Notice Content -->
+                <div class="notice-content">
+                    {{ notice.content|linebreaks }}
+                </div>
+                
+                <!-- Notice Status -->
+                <div class="mt-4 pt-3 border-top">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <strong>Category:</strong> 
+                                {% if notice.category == 'academic' %}
+                                    <span class="badge bg-primary">Academic</span>
+                                {% elif notice.category == 'maintenance' %}
+                                    <span class="badge bg-warning">Maintenance</span>
+                                {% elif notice.category == 'important' %}
+                                    <span class="badge bg-success">Important</span>
+                                {% elif notice.category == 'urgent' %}
+                                    <span class="badge bg-danger">Urgent</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ notice.get_category_display }}</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <small class="text-muted">
+                                <strong>Status:</strong> 
+                                {% if notice.is_expired %}
+                                    <span class="badge bg-warning">Expired</span>
+                                {% else %}
+                                    <span class="badge bg-success">Active</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Actions Panel -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tasks me-2"></i>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'hostel_management:notice_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Notices
+                    </a>
+                    
+                    {% if user.user_type in 'staff,provost,admin' %}
+                        <a href="/admin/hostel_management/notice/{{ notice.pk }}/change/" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Edit Notice
+                        </a>
+                    {% endif %}
+                    
+                    <button onclick="window.print()" class="btn btn-outline-secondary">
+                        <i class="fas fa-print me-2"></i>Print Notice
+                    </button>
+                    
+                    <button onclick="shareNotice()" class="btn btn-outline-info">
+                        <i class="fas fa-share me-2"></i>Share
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notice Information -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Notice Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <td><strong>Published:</strong></td>
+                        <td>{{ notice.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Author:</strong></td>
+                        <td>{{ notice.created_by.get_full_name|default:notice.created_by.username }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Category:</strong></td>
+                        <td>{{ notice.get_category_display }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Priority:</strong></td>
+                        <td>{{ notice.get_priority_display }}</td>
+                    </tr>
+                    {% if notice.expires_at %}
+                    <tr>
+                        <td><strong>Expires:</strong></td>
+                        <td>{{ notice.expires_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td>
+                            {% if notice.is_expired %}
+                                <span class="text-warning">Expired</span>
+                            {% else %}
+                                <span class="text-success">Active</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Related Actions -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-link me-2"></i>Related</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if notice.category == 'maintenance' %}
+                        <a href="{% url 'hostel_management:complaint_create' %}" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Report Issue
+                        </a>
+                    {% endif %}
+                    
+                    {% if notice.category == 'academic' %}
+                        <a href="{% url 'hostel_management:room_list' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-bed me-2"></i>View Rooms
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'hostel_management:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function shareNotice() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ notice.title }}',
+            text: '{{ notice.content|truncatewords:20 }}',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            alert('Notice link copied to clipboard!');
+        });
+    }
+}
+</script>
+
+<style>
+@media print {
+    .card-header, .btn, nav, .breadcrumb {
+        display: none !important;
+    }
+    .card {
+        border: none !important;
+    }
+}
+</style>
+{% endblock %}

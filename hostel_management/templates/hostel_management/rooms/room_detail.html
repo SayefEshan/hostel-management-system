@@ -1,0 +1,212 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}Room {{ room.room_number }} - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:room_list' %}">Rooms</a></li>
+                <li class="breadcrumb-item active">Room {{ room.room_number }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-bed me-2"></i>Room {{ room.room_number }}</h4>
+                {% if room.is_full %}
+                    <span class="badge bg-danger fs-6">Full</span>
+                {% else %}
+                    <span class="badge bg-success fs-6">Available</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Block:</strong></td>
+                                <td>{{ room.block }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Floor:</strong></td>
+                                <td>{{ room.floor }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Room Type:</strong></td>
+                                <td>{{ room.get_room_type_display }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Capacity:</strong></td>
+                                <td>{{ room.capacity }} beds</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Current Occupancy:</strong></td>
+                                <td>{{ room.current_occupancy }} beds</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Available Beds:</strong></td>
+                                <td>
+                                    <span class="{% if room.available_beds > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ room.available_beds }} beds
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-cogs me-2"></i>Facilities</h6>
+                        <div class="mb-3">
+                            {% if room.has_attached_bathroom %}
+                                <div class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>Attached Bathroom</span>
+                                </div>
+                            {% else %}
+                                <div class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    <span class="text-muted">No Attached Bathroom</span>
+                                </div>
+                            {% endif %}
+                            
+                            {% if room.has_ac %}
+                                <div class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <span>Air Conditioned</span>
+                                </div>
+                            {% else %}
+                                <div class="mb-2">
+                                    <i class="fas fa-times text-danger me-2"></i>
+                                    <span class="text-muted">Not Air Conditioned</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <h6><i class="fas fa-chart-bar me-2"></i>Occupancy Status</h6>
+                        <div class="progress mb-3">
+                            {% widthratio room.current_occupancy room.capacity 100 as occupancy_percent %}
+                            <div class="progress-bar {% if occupancy_percent >= 100 %}bg-danger{% elif occupancy_percent >= 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                                 role="progressbar" style="width: {{ occupancy_percent }}%" 
+                                 aria-valuenow="{{ occupancy_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ occupancy_percent }}%
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            {{ room.current_occupancy }} of {{ room.capacity }} beds occupied
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Applications (if staff/admin) -->
+        {% if user.user_type in 'staff,provost,admin' %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-clipboard-list me-2"></i>Recent Applications</h5>
+            </div>
+            <div class="card-body">
+                {% if room.applications.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in room.applications.all|slice:":5" %}
+                                <tr>
+                                    <td>{{ application.student.student_id }}</td>
+                                    <td>{{ application.application_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if application.status == 'approved' %}success{% elif application.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                            {{ application.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ application.priority_score }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No applications for this room yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Action Panel -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tasks me-2"></i>Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if user.user_type == 'student' %}
+                    {% if not room.is_full %}
+                        <a href="{% url 'hostel_management:room_apply' room.pk %}" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-plus me-2"></i>Apply for this Room
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary w-100 mb-2" disabled>
+                            <i class="fas fa-times me-2"></i>Room is Full
+                        </button>
+                    {% endif %}
+                    
+                    <a href="{% url 'hostel_management:room_list' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Room List
+                    </a>
+                    
+                {% elif user.user_type in 'staff,provost,admin' %}
+                    <a href="/admin/hostel_management/room/{{ room.pk }}/change/" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-edit me-2"></i>Edit Room Details
+                    </a>
+                    
+                    <a href="/admin/hostel_management/roomapplication/?room__id__exact={{ room.pk }}" class="btn btn-info w-100 mb-2">
+                        <i class="fas fa-clipboard-list me-2"></i>View All Applications
+                    </a>
+                    
+                    <a href="{% url 'hostel_management:room_list' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Room List
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-pie me-2"></i>Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-primary">{{ room.capacity }}</h4>
+                        <small class="text-muted">Total Beds</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="{% if room.available_beds > 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ room.available_beds }}
+                        </h4>
+                        <small class="text-muted">Available</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

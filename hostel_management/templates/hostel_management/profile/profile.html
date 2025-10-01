@@ -1,0 +1,294 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}My Profile - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-user me-2"></i>My Profile
+            </h1>
+            <a href="{% url 'hostel_management:profile_edit' %}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- User Information -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-id-card me-2"></i>Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Username:</strong></td>
+                                <td>{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full Name:</strong></td>
+                                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone:</strong></td>
+                                <td>{{ user.phone|default:"Not provided" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>User Type:</strong></td>
+                                <td>
+                                    <span class="badge bg-primary">{{ user.get_user_type_display }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Member Since:</strong></td>
+                                <td>{{ user.date_joined|date:"F d, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Last Login:</strong></td>
+                                <td>{{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Account Status:</strong></td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Student Profile (if student) -->
+        {% if user.user_type == 'student' and student_profile %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-graduation-cap me-2"></i>Academic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Student ID:</strong></td>
+                                <td>{{ student_profile.student_id }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Department:</strong></td>
+                                <td>{{ student_profile.department }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Faculty:</strong></td>
+                                <td>{{ student_profile.faculty }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Academic Level:</strong></td>
+                                <td>{{ student_profile.academic_level }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Academic Year:</strong></td>
+                                <td>{{ student_profile.academic_year }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Semester:</strong></td>
+                                <td>{{ student_profile.semester }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Enrollment Date:</strong></td>
+                                <td>{{ student_profile.date_of_enrollment|date:"F d, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Room Status:</strong></td>
+                                <td>
+                                    {% if student_profile.is_allocated %}
+                                        <span class="badge bg-success">Room Allocated</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Not Allocated</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Emergency Contact -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-phone-alt me-2"></i>Emergency Contact</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Contact Name:</strong> {{ student_profile.emergency_contact_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Contact Phone:</strong> {{ student_profile.emergency_contact }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif user.user_type == 'student' %}
+        <!-- Incomplete Profile Warning -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Incomplete Profile</h6>
+                    <p>Your student profile is incomplete. Please complete your profile to access all hostel management features.</p>
+                    <a href="{% url 'hostel_management:profile_edit' %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit me-2"></i>Complete Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'hostel_management:profile_edit' %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                    
+                    {% if user.user_type == 'student' %}
+                        <a href="{% url 'hostel_management:my_applications' %}" class="btn btn-outline-info">
+                            <i class="fas fa-clipboard-list me-2"></i>My Applications
+                        </a>
+                        <a href="{% url 'hostel_management:room_list' %}" class="btn btn-outline-success">
+                            <i class="fas fa-bed me-2"></i>Browse Rooms
+                        </a>
+                        <a href="{% url 'hostel_management:complaint_list' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>My Complaints
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'hostel_management:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Completion -->
+        {% if user.user_type == 'student' %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-pie me-2"></i>Profile Completion</h5>
+            </div>
+            <div class="card-body">
+                {% if student_profile %}
+                    {% comment %} Calculate completion percentage {% endcomment %}
+                    {% with completion=85 %}
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ completion }}%" 
+                             aria-valuenow="{{ completion }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ completion }}%
+                        </div>
+                    </div>
+                    <p class="small text-muted">Your profile is {{ completion }}% complete.</p>
+                    
+                    <h6 class="small">Missing Information:</h6>
+                    <ul class="small">
+                        {% if not user.phone %}
+                            <li>Phone number</li>
+                        {% endif %}
+                        {% if student_profile.emergency_contact == "Not Set" %}
+                            <li>Emergency contact</li>
+                        {% endif %}
+                    </ul>
+                    {% endwith %}
+                {% else %}
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-danger" role="progressbar" 
+                             style="width: 25%" 
+                             aria-valuenow="25" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            25%
+                        </div>
+                    </div>
+                    <p class="small text-muted">Your profile is only 25% complete. Please complete your student profile.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Account Settings -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-cog me-2"></i>Account Settings</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button onclick="changePassword()" class="btn btn-outline-warning btn-sm">
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </button>
+                    <button onclick="downloadData()" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-download me-2"></i>Download My Data
+                    </button>
+                    <a href="{% url 'hostel_management:logout' %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-question-circle me-2"></i>Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <p class="small">
+                    If you need help updating your profile or have any questions about your account, please contact the hostel office.
+                </p>
+                <p class="small">
+                    <strong>Office Hours:</strong> 9 AM - 5 PM<br>
+                    <strong>Phone:</strong> +880-XXX-XXXXXX<br>
+                    <strong>Email:</strong> hostel@bau.edu.bd
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function changePassword() {
+    alert('Password change functionality will be implemented in the next phase. Please contact the hostel office for password reset.');
+}
+
+function downloadData() {
+    alert('Data download functionality will be implemented in the next phase.');
+}
+</script>
+{% endblock %}

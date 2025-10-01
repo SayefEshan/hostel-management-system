@@ -1,0 +1,186 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}Notices - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-bullhorn me-2"></i>Hostel Notices
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% if notices %}
+            {% for notice in notices %}
+            <div class="card mb-3 {% if notice.priority == 'urgent' %}border-danger{% elif notice.priority == 'high' %}border-warning{% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            {% if notice.priority == 'urgent' %}
+                                <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                            {% elif notice.priority == 'high' %}
+                                <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                            {% elif notice.category == 'academic' %}
+                                <i class="fas fa-graduation-cap text-primary me-2"></i>
+                            {% elif notice.category == 'maintenance' %}
+                                <i class="fas fa-tools text-info me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle text-secondary me-2"></i>
+                            {% endif %}
+                            {{ notice.title }}
+                        </h5>
+                        <small class="text-muted">
+                            <i class="fas fa-user me-1"></i>{{ notice.created_by.get_full_name|default:notice.created_by.username }}
+                            <i class="fas fa-calendar ms-3 me-1"></i>{{ notice.created_at|date:"M d, Y" }}
+                            {% if notice.expires_at %}
+                                <i class="fas fa-clock ms-3 me-1"></i>Expires: {{ notice.expires_at|date:"M d, Y" }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div>
+                        <!-- Priority Badge -->
+                        {% if notice.priority == 'urgent' %}
+                            <span class="badge bg-danger">Urgent</span>
+                        {% elif notice.priority == 'high' %}
+                            <span class="badge bg-warning">High Priority</span>
+                        {% elif notice.priority == 'medium' %}
+                            <span class="badge bg-info">Medium Priority</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Low Priority</span>
+                        {% endif %}
+                        
+                        <!-- Category Badge -->
+                        {% if notice.category == 'academic' %}
+                            <span class="badge bg-primary ms-1">Academic</span>
+                        {% elif notice.category == 'maintenance' %}
+                            <span class="badge bg-warning ms-1">Maintenance</span>
+                        {% elif notice.category == 'important' %}
+                            <span class="badge bg-success ms-1">Important</span>
+                        {% else %}
+                            <span class="badge bg-secondary ms-1">{{ notice.get_category_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Content Preview -->
+                    <p class="card-text">
+                        {% if notice.content|length > 200 %}
+                            {{ notice.content|truncatewords:30 }}
+                            <a href="{% url 'hostel_management:notice_detail' notice.pk %}" class="text-decoration-none">
+                                ...read more
+                            </a>
+                        {% else %}
+                            {{ notice.content|linebreaks }}
+                        {% endif %}
+                    </p>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if notice.content|length > 200 %}
+                                <a href="{% url 'hostel_management:notice_detail' notice.pk %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Read Full Notice
+                                </a>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">
+                            {% if notice.is_expired %}
+                                <i class="fas fa-exclamation-triangle text-warning me-1"></i>Expired
+                            {% else %}
+                                <i class="fas fa-check-circle text-success me-1"></i>Active
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="row">
+                <div class="col-12">
+                    <nav aria-label="Notice pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+            
+        {% else %}
+            <!-- No Notices -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                    <h4>No Notices Available</h4>
+                    <p class="text-muted">There are currently no published notices. Check back later for updates.</p>
+                    <a href="{% url 'hostel_management:dashboard' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Filter (Future Enhancement) -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-filter me-2"></i>Quick Filter</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="?category=urgent" class="btn btn-outline-danger w-100 mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Urgent Notices
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="?category=academic" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="fas fa-graduation-cap me-2"></i>Academic
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="?category=maintenance" class="btn btn-outline-warning w-100 mb-2">
+                            <i class="fas fa-tools me-2"></i>Maintenance
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'hostel_management:notice_list' %}" class="btn btn-outline-secondary w-100 mb-2">
+                            <i class="fas fa-list me-2"></i>All Notices
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}My Room Applications - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-clipboard-list me-2"></i>My Room Applications
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% if applications %}
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-history me-2"></i>Application History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Room</th>
+                                    <th>Block</th>
+                                    <th>Type</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                    <th>Priority Score</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ application.room.room_number }}</strong>
+                                    </td>
+                                    <td>{{ application.room.block }}</td>
+                                    <td>{{ application.room.get_room_type_display }}</td>
+                                    <td>{{ application.application_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if application.status == 'pending' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>{{ application.get_status_display }}
+                                            </span>
+                                        {% elif application.status == 'approved' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>{{ application.get_status_display }}
+                                            </span>
+                                        {% elif application.status == 'rejected' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>{{ application.get_status_display }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                {{ application.get_status_display }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ application.priority_score }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'hostel_management:room_detail' application.room.pk %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>View Room
+                                        </a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Application Details Row -->
+                                {% if application.preferences %}
+                                <tr class="table-light">
+                                    <td colspan="7">
+                                        <small>
+                                            <strong>Preferences:</strong> {{ application.preferences }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                
+                                {% if application.admin_notes %}
+                                <tr class="table-light">
+                                    <td colspan="7">
+                                        <small>
+                                            <strong>Admin Notes:</strong> {{ application.admin_notes }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Application Statistics -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-primary">{{ applications|length }}</h3>
+                            <p class="card-text">Total Applications</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-warning">
+                                {% for app in applications %}{% if app.status == 'pending' %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %}
+                            </h3>
+                            <p class="card-text">Pending</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-success">
+                                {% for app in applications %}{% if app.status == 'approved' %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %}
+                            </h3>
+                            <p class="card-text">Approved</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-danger">
+                                {% for app in applications %}{% if app.status == 'rejected' %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %}
+                            </h3>
+                            <p class="card-text">Rejected</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        {% else %}
+            <!-- No Applications -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-clipboard fa-3x text-muted mb-3"></i>
+                    <h4>No Applications Yet</h4>
+                    <p class="text-muted">You haven't applied for any rooms yet. Browse available rooms to get started.</p>
+                    <a href="{% url 'hostel_management:room_list' %}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Browse Available Rooms
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <a href="{% url 'hostel_management:room_list' %}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="fas fa-bed me-2"></i>Browse Available Rooms
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'hostel_management:profile' %}" class="btn btn-outline-info w-100 mb-2">
+                            <i class="fas fa-user me-2"></i>View My Profile
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'hostel_management:dashboard' %}" class="btn btn-outline-success w-100 mb-2">
+                            <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,220 @@
+{% extends 'hostel_management/base/base.html' %}
+
+{% block title %}Submit Complaint - Hostel Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'hostel_management:complaint_list' %}">Complaints</a></li>
+                <li class="breadcrumb-item active">New Complaint</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-exclamation-triangle me-2"></i>Submit New Complaint</h4>
+            </div>
+            <div class="card-body">
+                <!-- Information Alert -->
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>Before You Submit</h6>
+                    <ul class="mb-0">
+                        <li>Provide clear and detailed description of the issue</li>
+                        <li>Include specific location if applicable</li>
+                        <li>Select appropriate category and priority level</li>
+                        <li>You will receive updates on complaint status via the system</li>
+                    </ul>
+                </div>
+                
+                <!-- Complaint Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tags me-1"></i>Category *
+                                </label>
+                                <select class="form-control {% if form.category.errors %}is-invalid{% endif %}" 
+                                        name="{{ form.category.name }}" 
+                                        id="{{ form.category.id_for_label }}" required>
+                                    <option value="">Select Category</option>
+                                    {% for value, label in form.category.field.choices %}
+                                        <option value="{{ value }}" {% if value == form.category.value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.category.errors %}
+                                    <div class="invalid-feedback">{{ form.category.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                    <i class="fas fa-flag me-1"></i>Priority Level *
+                                </label>
+                                <select class="form-control {% if form.priority.errors %}is-invalid{% endif %}" 
+                                        name="{{ form.priority.name }}" 
+                                        id="{{ form.priority.id_for_label }}" required>
+                                    <option value="">Select Priority</option>
+                                    {% for value, label in form.priority.field.choices %}
+                                        <option value="{{ value }}" {% if value == form.priority.value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.priority.errors %}
+                                    <div class="invalid-feedback">{{ form.priority.errors }}</div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <small>
+                                        <strong>Urgent:</strong> Safety issues, emergencies<br>
+                                        <strong>High:</strong> Major disruptions<br>
+                                        <strong>Medium:</strong> Standard issues<br>
+                                        <strong>Low:</strong> Minor inconveniences
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.subject.id_for_label }}" class="form-label">
+                            <i class="fas fa-heading me-1"></i>Subject *
+                        </label>
+                        <input type="text" class="form-control {% if form.subject.errors %}is-invalid{% endif %}" 
+                               name="{{ form.subject.name }}" 
+                               id="{{ form.subject.id_for_label }}" 
+                               value="{{ form.subject.value|default:'' }}" 
+                               placeholder="Brief description of the issue" required>
+                        {% if form.subject.errors %}
+                            <div class="invalid-feedback">{{ form.subject.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.location.id_for_label }}" class="form-label">
+                            <i class="fas fa-map-marker-alt me-1"></i>Location
+                        </label>
+                        <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}" 
+                               name="{{ form.location.name }}" 
+                               id="{{ form.location.id_for_label }}" 
+                               value="{{ form.location.value|default:'' }}" 
+                               placeholder="Room number, common area, or specific location">
+                        {% if form.location.errors %}
+                            <div class="invalid-feedback">{{ form.location.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Specify the exact location where the issue occurred (optional)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Detailed Description *
+                        </label>
+                        <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" 
+                                  name="{{ form.description.name }}" 
+                                  id="{{ form.description.id_for_label }}" 
+                                  rows="5" 
+                                  placeholder="Provide a detailed description of the issue, including when it occurred, what happened, and any other relevant information..." required>{{ form.description.value|default:'' }}</textarea>
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback">{{ form.description.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Be as specific as possible to help us resolve your issue quickly</div>
+                    </div>
+                    
+                    <!-- Terms -->
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Complaint Guidelines</h6>
+                        <ul class="mb-0 small">
+                            <li>All complaints will be reviewed and assigned to appropriate staff</li>
+                            <li>Response time varies by priority: Urgent (immediate), High (24hrs), Medium (48hrs), Low (3-5 days)</li>
+                            <li>You can track the status of your complaint in the system</li>
+                            <li>False or malicious complaints may result in disciplinary action</li>
+                            <li>For emergencies, contact hostel security directly</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="guidelines" required>
+                        <label class="form-check-label" for="guidelines">
+                            I have read and understood the complaint guidelines above
+                        </label>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'hostel_management:complaint_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Complaints
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Complaint
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Help Section -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-question-circle me-2"></i>Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <h6>Emergency Contacts:</h6>
+                <p class="small">
+                    <strong>Security:</strong> +880-XXX-XXXXXX<br>
+                    <strong>Maintenance:</strong> +880-XXX-XXXXXX<br>
+                    <strong>Hostel Office:</strong> +880-XXX-XXXXXX
+                </p>
+                
+                <h6>Common Issues:</h6>
+                <ul class="small">
+                    <li><strong>Maintenance:</strong> Plumbing, electrical, furniture</li>
+                    <li><strong>Security:</strong> Safety concerns, theft</li>
+                    <li><strong>Facilities:</strong> Internet, laundry, common areas</li>
+                    <li><strong>Cleanliness:</strong> Cleaning, pest control</li>
+                </ul>
+                
+                <h6>Response Times:</h6>
+                <ul class="small">
+                    <li><strong>Urgent:</strong> Immediate response</li>
+                    <li><strong>High:</strong> Within 24 hours</li>
+                    <li><strong>Medium:</strong> Within 48 hours</li>
+                    <li><strong>Low:</strong> Within 3-5 days</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Recent Notices -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-bullhorn me-2"></i>Related Notices</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    Check the <a href="{% url 'hostel_management:notice_list' %}">notices section</a> 
+                    for any announcements about ongoing maintenance or known issues.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
